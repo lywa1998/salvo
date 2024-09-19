@@ -1,3 +1,4 @@
+use convert_case::{Case, Casing};
 use proc_macro2::{Span, TokenStream};
 use quote::{quote, ToTokens};
 use syn::{Expr, Ident, ImplItem, Item, Pat, ReturnType, Signature, Type};
@@ -15,12 +16,13 @@ fn metadata(
     name: &Ident,
     mut modifiers: Vec<TokenStream>,
 ) -> DiagResult<TokenStream> {
+    let snake_name = name.to_string().to_case(Case::Snake);
     let tfn = Ident::new(
-        &format!("__macro_gen_oapi_endpoint_type_id_{}", name),
+        &format!("__macro_gen_oapi_endpoint_type_id_{}", snake_name),
         Span::call_site(),
     );
     let cfn = Ident::new(
-        &format!("__macro_gen_oapi_endpoint_creator_{}", name),
+        &format!("__macro_gen_oapi_endpoint_creator_{}", snake_name),
         Span::call_site(),
     );
     let opt = Operation::new(&attr);

@@ -6,11 +6,22 @@ async fn hello(name: QueryParam<String, false>) -> String {
     format!("Hello, {}!", name.as_deref().unwrap_or("World"))
 }
 
+struct GreetHandler;
+
+#[endpoint]
+impl GreetHandler {
+    async fn handle(&self, name: QueryParam<String, false>) -> String {
+        format!("Hello, {}!", name.as_deref().unwrap_or("World"))
+    }
+}
+
 #[tokio::main]
 async fn main() {
     tracing_subscriber::fmt().init();
 
-    let router = Router::new().push(Router::with_path("hello").get(hello));
+    let router = Router::new()
+        .push(Router::with_path("hello").get(hello))
+        .push(Router::with_path("greet").get(GreetHandler));
 
     let doc = OpenApi::new("test api", "0.0.1").merge_router(&router);
 
